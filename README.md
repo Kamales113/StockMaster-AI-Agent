@@ -1,198 +1,181 @@
 # StockMaster AI Agent
 
-## Overview
+An AI-powered stock analysis assistant built using:
 
-StockMaster AI Agent is a real-time AI-powered stock analysis assistant built using:
-
+* Python
+* FastAPI
 * Dify AI Agent
 * Groq LLM
-* FastAPI
-* Yahoo Finance API
-* Technical Analysis Indicators (RSI)
+* yFinance
+* Technical Indicators (RSI, MACD, Moving Averages)
 * ngrok
-* OpenAPI Tool Calling
-
-This project demonstrates how modern AI agents work using:
-
-```text
-LLM + Tool Calling + APIs + Backend + Real-Time Data
-```
-
-The AI agent can:
-
-* Understand natural language stock questions
-* Convert company names into valid Yahoo Finance symbols
-* Call a backend API automatically
-* Fetch live stock market data
-* Perform RSI-based technical analysis
-* Return beginner-friendly explanations
 
 ---
 
-# Final Architecture
+# Project Overview
+
+StockMaster is an AI-based stock analysis system that:
+
+* Retrieves live stock market data
+* Calculates technical indicators
+* Generates BUY / HOLD / SELL recommendations
+* Provides confidence scores
+* Compares multiple stocks
+* Uses an AI agent for natural conversation
+
+The system combines:
+
+* AI reasoning
+* Backend APIs
+* Technical analysis logic
+* Tool calling
+* Financial data processing
+
+---
+
+# Features
+
+## Current Features
+
+### Single Stock Analysis
+
+Analyze stocks using:
+
+* RSI
+* MACD
+* Moving Average Trend
+* Confidence Score
+* Recommendation Engine
+
+Example:
 
 ```text
-User
-  ↓
+Analyze TCS
+```
+
+---
+
+### Multi-Stock Comparison
+
+Compare two stocks and identify which looks technically stronger.
+
+Example:
+
+```text
+Compare TCS and Infosys
+```
+
+---
+
+### Confidence Scoring Engine
+
+Weighted scoring system:
+
+| Indicator | Weight |
+| --------- | ------ |
+| RSI       | 30     |
+| Trend     | 35     |
+| MACD      | 35     |
+
+Final confidence:
+
+* 70+ → BUY
+* 40–69 → HOLD
+* Below 40 → SELL
+
+---
+
+### Natural Language Interaction
+
+Users can ask:
+
+```text
+Analyze TCS
+```
+
+instead of:
+
+```text
+TCS.NS
+```
+
+---
+
+# Architecture
+
+```text
 Dify AI Agent
-  ↓
-Groq LLM
-  ↓
+      ↓
 Tool Calling
-  ↓
+      ↓
 FastAPI Backend
-  ↓
-Yahoo Finance API
-  ↓
-Technical Analysis (RSI)
-  ↓
-JSON Response
-  ↓
-AI Explanation
+      ↓
+Technical Analysis Engine
+      ↓
+Yahoo Finance Data
 ```
 
 ---
 
 # Technologies Used
 
-| Technology | Purpose                    |
-| ---------- | -------------------------- |
-| Python     | Backend language           |
-| FastAPI    | API framework              |
-| yfinance   | Stock data retrieval       |
-| ta         | Technical analysis library |
-| Groq       | LLM provider               |
-| Dify       | AI agent orchestration     |
-| ngrok      | Public API tunneling       |
-| OpenAPI    | Tool schema integration    |
-| VS Code    | Development environment    |
+| Technology | Purpose              |
+| ---------- | -------------------- |
+| Python     | Backend logic        |
+| FastAPI    | API server           |
+| Dify       | AI orchestration     |
+| Groq       | LLM provider         |
+| yFinance   | Stock data           |
+| ta         | Technical indicators |
+| ngrok      | Public API exposure  |
+| GitHub     | Version control      |
 
 ---
 
-# Step-by-Step Complete Setup
+# Installation Guide
 
-# Step 1 — Install Python
-
-Download Python:
-
-[https://www.python.org/downloads/](https://www.python.org/downloads/)
-
-IMPORTANT:
-During installation enable:
-
-```text
-Add Python to PATH
-```
-
-Verify installation:
+## Step 1 — Clone Repository
 
 ```bash
-python --version
+git clone YOUR_GITHUB_REPO_URL
+cd StockMaster
 ```
 
 ---
 
-# Step 2 — Install VS Code
+## Step 2 — Create Virtual Environment (Optional but Recommended)
 
-Download:
-
-[https://code.visualstudio.com/](https://code.visualstudio.com/)
-
-Install VS Code and open the project folder.
-
----
-
-# Step 3 — Create Project Folder
-
-Create folder:
-
-```text
-StockMaster
+```bash
+python -m venv venv
 ```
 
-Open it in VS Code.
+Activate:
+
+### Windows
+
+```bash
+venv\Scripts\activate
+```
 
 ---
 
-# Step 4 — Install Required Libraries
-
-Open terminal inside VS Code.
-
-Run:
+## Step 3 — Install Dependencies
 
 ```bash
 pip install fastapi uvicorn yfinance pandas ta
 ```
 
-Installed libraries:
-
-| Library  | Purpose                       |
-| -------- | ----------------------------- |
-| fastapi  | API creation                  |
-| uvicorn  | FastAPI server                |
-| yfinance | Stock market data             |
-| pandas   | Data handling                 |
-| ta       | Technical analysis indicators |
-
 ---
 
-# Step 5 — Create Backend API
+# Running The Backend
 
-Create file:
-
-```text
-app.py
-```
-
-Paste:
-
-```python
-from fastapi import FastAPI
-import yfinance as yf
-from ta.momentum import RSIIndicator
-
-app = FastAPI()
-
-@app.get("/analyze")
-def analyze_stock(symbol: str):
-
-    stock = yf.download(symbol, period="3mo")
-
-    if stock.empty:
-        return {"error": "Invalid stock symbol"}
-
-    close_prices = stock['Close'].squeeze()
-
-    rsi = RSIIndicator(close_prices).rsi().iloc[-1]
-
-    current_price = close_prices.iloc[-1]
-
-    if rsi > 70:
-        signal = "Overbought"
-    elif rsi < 30:
-        signal = "Oversold"
-    else:
-        signal = "Neutral"
-
-    return {
-        "stock": symbol,
-        "price": round(float(current_price), 2),
-        "RSI": round(float(rsi), 2),
-        "signal": signal
-    }
-```
-
----
-
-# Step 6 — Run Backend Server
-
-Run:
+## Start FastAPI Server
 
 ```bash
 python -m uvicorn app:app --reload
 ```
 
-Expected output:
+Expected Output:
 
 ```text
 Uvicorn running on http://127.0.0.1:8000
@@ -200,331 +183,150 @@ Uvicorn running on http://127.0.0.1:8000
 
 ---
 
-# Step 7 — Test API
+# Testing API
 
-Open browser:
+## Test Single Stock
 
 ```text
 http://127.0.0.1:8000/analyze?symbol=TCS.NS
 ```
 
-Expected JSON response:
+---
 
-```json
-{
-  "stock": "TCS.NS",
-  "price": 4200,
-  "RSI": 55.3,
-  "signal": "Neutral"
-}
+## Test Compare API
+
+```text
+http://127.0.0.1:8000/compare?symbol1=TCS.NS&symbol2=INFY.NS
 ```
 
 ---
 
-# Step 8 — Setup Dify AI Agent
+# ngrok Setup
 
-Open:
+## Why ngrok?
 
-[https://dify.ai/](https://dify.ai/)
-
-Create account.
-
-Go to:
-
-```text
-Studio → Create From Blank → Agent
-```
-
-Agent name:
-
-```text
-StockMaster
-```
+Dify cannot access localhost directly.
+ngrok creates a public URL for the FastAPI server.
 
 ---
 
-# Step 9 — Setup Groq Model Provider
+## Step 1 — Download ngrok
 
-Open:
+Download from:
 
-[https://console.groq.com/](https://console.groq.com/)
-
-Create free account.
-
-Generate API key.
-
-Inside Dify:
-
-```text
-Settings → Model Provider → Groq
-```
-
-Paste API key.
-
-Use model:
-
-```text
-Llama-3.1-8b-instant
-```
-
-Reason:
-
-* Stable
-* Fast
-* Beginner friendly
-* Reliable with Dify
+[https://ngrok.com](https://ngrok.com)
 
 ---
 
-# Step 10 — Configure Agent Prompt
-
-Inside Dify Agent Instructions:
-
-```text
-You are an AI stock analyst.
-
-IMPORTANT:
-You MUST use the analyze_stock tool whenever a user asks about any stock.
-
-Indian stock symbols MUST use the Yahoo Finance format:
-- TCS → TCS.NS
-- RELIANCE → RELIANCE.NS
-- INFY → INFY.NS
-- HDFCBANK → HDFCBANK.NS
-
-Steps:
-1. Extract the company name or stock symbol.
-2. Convert it into Yahoo Finance symbol format ending with .NS
-3. Use the analyze_stock tool with that symbol.
-4. Read the returned JSON.
-5. Explain the RSI, signal, and price simply.
-6. Mention whether the stock looks overbought, oversold, or neutral.
-7. Always warn this is not financial advice.
-```
-
----
-
-# Step 11 — Install ngrok
-
-Download:
-
-[https://ngrok.com/download](https://ngrok.com/download)
-
-Create free account:
-
-[https://dashboard.ngrok.com/](https://dashboard.ngrok.com/)
-
----
-
-# Step 12 — Configure ngrok
-
-Open terminal inside ngrok folder.
-
-Run:
+## Step 2 — Add Auth Token
 
 ```bash
-.\ngrok.exe config add-authtoken YOUR_TOKEN
+ngrok config add-authtoken YOUR_TOKEN
 ```
 
 ---
 
-# Step 13 — Expose Backend Publicly
-
-Keep FastAPI server running.
-
-Open NEW terminal.
-
-Run:
+## Step 3 — Start ngrok
 
 ```bash
-.\ngrok.exe http 8000
+ngrok http 8000
 ```
 
-You will get:
+Example Output:
 
 ```text
 https://your-ngrok-url.ngrok-free.app
 ```
 
-Test:
-
-```text
-https://your-ngrok-url.ngrok-free.app/analyze?symbol=TCS.NS
-```
-
 ---
 
-# Step 14 — Import OpenAPI Schema into Dify
+# OpenAPI Schema
 
-Open:
+FastAPI automatically generates:
+
+```text
+/openapi.json
+```
+
+Example:
 
 ```text
 https://your-ngrok-url.ngrok-free.app/openapi.json
 ```
 
-Verify schema loads.
-
-Inside Dify:
-
-```text
-Tools → Create Custom Tool → Import from URL
-```
-
-Paste:
-
-```text
-https://your-ngrok-url.ngrok-free.app/openapi.json
-```
+This schema is used inside Dify Custom Tool.
 
 ---
 
-# Step 15 — Manual OpenAPI Schema (Fallback)
+# Dify Setup
 
-If automatic import fails:
+## Create Agent
 
-```json
-{
-  "openapi": "3.1.0",
-  "info": {
-    "title": "Stock Analyzer API",
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "https://your-ngrok-url.ngrok-free.app"
-    }
-  ],
-  "paths": {
-    "/analyze": {
-      "get": {
-        "summary": "Analyze Stock",
-        "operationId": "analyze_stock",
-        "parameters": [
-          {
-            "name": "symbol",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response"
-          }
-        }
-      }
-    }
-  }
-}
-```
+1. Open Dify
+2. Create Agent
+3. Add instructions
+4. Select Groq model
 
----
-
-# Step 16 — Enable Tool in Agent
-
-Inside Dify:
-
-```text
-Tools → Add Tool → Enable analyze_stock
-```
-
-You should see:
-
-```text
-1/1 Enabled
-```
-
----
-
-# Final Test
-
-Ask:
-
-```text
-Analyze TCS stock
-```
-
-Expected workflow:
-
-```text
-User asks question
-↓
-LLM extracts stock symbol
-↓
-LLM calls tool
-↓
-FastAPI backend fetches stock data
-↓
-RSI calculated
-↓
-JSON returned
-↓
-LLM explains naturally
-```
-
----
-
-# Debugging Journey and Fixes
-
-# 1. Model Compatibility Issues
-
-Problem:
-
-```text
-Deprecated or incompatible models
-```
-
-Fix:
-
-Used:
+Recommended Model:
 
 ```text
 Llama-3.1-8b-instant
 ```
 
-Reason:
-Stable and officially supported.
+---
+
+# Custom Tool Setup
+
+## Steps
+
+1. Open Tools
+2. Create Custom Tool
+3. Import OpenAPI schema using:
+
+```text
+https://your-ngrok-url.ngrok-free.app/openapi.json
+```
+
+4. Enable the tool
+5. Add tool to the agent
 
 ---
 
-# 2. Uvicorn Not Recognized
+# Common Errors & Fixes
 
-Problem:
+## Error 1 — uvicorn not recognized
+
+### Problem
 
 ```text
 uvicorn is not recognized
 ```
 
-Fix:
+### Fix
 
-Used:
+Use:
 
 ```bash
 python -m uvicorn app:app --reload
 ```
 
-Reason:
-Windows PATH issue.
-
 ---
 
-# 3. Internal Server Error
+## Error 2 — Internal Server Error
 
-Problem:
+### Problem
 
 ```text
-500 Internal Server Error
+Internal Server Error
 ```
 
-Cause:
+### Cause
 
-Missing query parameter.
+Incorrect API route or missing query parameter.
 
-Fix:
+### Fix
 
-Correct endpoint:
+Correct usage:
 
 ```text
 /analyze?symbol=TCS.NS
@@ -532,240 +334,241 @@ Correct endpoint:
 
 ---
 
-# 4. Pandas Dimensionality Error
+## Error 3 — 404 Not Found
 
-Problem:
+### Cause
 
-```text
-Data must be 1-dimensional
-```
-
-Cause:
-
-Yahoo Finance returned dataframe shape:
+Opening:
 
 ```text
-(60,1)
+/
 ```
 
-instead of series.
+instead of:
 
-Fix:
+```text
+/analyze
+```
 
-```python
-close_prices = stock['Close'].squeeze()
+### Fix
+
+Use valid routes.
+
+---
+
+## Error 4 — invalid schema: servers
+
+### Cause
+
+Dify schema import issue.
+
+### Fix
+
+Manually edit schema or re-import OpenAPI after backend restart.
+
+---
+
+## Error 5 — ngrok not recognized
+
+### Cause
+
+ngrok executable path issue.
+
+### Fix
+
+Run command from ngrok folder:
+
+```bash
+.\ngrok.exe http 8000
 ```
 
 ---
 
-# 5. localhost Access Problem
+# Important Development Notes
 
-Problem:
+## ngrok URLs Change Every Restart
 
-Dify cloud could not access:
+Every time ngrok restarts:
 
-```text
-127.0.0.1
-```
+* new public URL generated
+* Dify schema must be updated
 
-Reason:
+This is normal during local development.
 
-localhost only works inside your computer.
-
-Fix:
-
-Used ngrok public tunnel.
+Permanent deployment later solves this issue.
 
 ---
 
-# 6. OpenAPI Import Failure
+# Current API Endpoints
 
-Problem:
-
-```text
-schema is required
-```
-
-Fix:
-
-Added:
-
-```json
-"servers"
-```
-
-inside schema.
-
----
-
-# 7. Tool Not Being Used
-
-Problem:
+## Home Route
 
 ```text
-0/0 Enabled
-```
-
-Cause:
-
-Tool package enabled but endpoint not selected.
-
-Fix:
-
-Enabled actual:
-
-```text
-analyze_stock
-```
-
-endpoint.
-
----
-
-# 8. AI Failed to Detect Symbols
-
-Problem:
-
-AI passed invalid stock symbols.
-
-Fix:
-
-Added Yahoo Finance symbol rules into system prompt.
-
-Example:
-
-```text
-TCS → TCS.NS
+/
 ```
 
 ---
 
-# Concepts Learned
+## Analyze Single Stock
 
-This project teaches:
+```text
+/analyze?symbol=TCS.NS
+```
 
-* AI agents
-* LLM orchestration
-* FastAPI
-* APIs
-* JSON
-* OpenAPI
-* Tool calling
-* Prompt engineering
-* Backend debugging
-* ngrok tunneling
-* Real-time data systems
-* Technical analysis
-* AI architecture
+---
+
+## Compare Two Stocks
+
+```text
+/compare?symbol1=TCS.NS&symbol2=INFY.NS
+```
+
+---
+
+# Project Workflow
+
+```text
+User Query
+    ↓
+Dify Agent
+    ↓
+Tool Calling
+    ↓
+FastAPI Backend
+    ↓
+Technical Analysis
+    ↓
+AI Explanation
+```
 
 ---
 
 # Future Improvements
 
-Potential upgrades:
+## Phase 1 — Intelligence Upgrades
 
-* MACD analysis
-* Moving averages
-* Bollinger bands
-* Candlestick charts
+* Company name → stock symbol mapping
+* Better confidence engine
+* More indicators
+* Support/resistance detection
+* Candlestick pattern analysis
+* Volatility analysis
+
+---
+
+## Phase 2 — User Experience
+
+* Dashboard UI
+* Charts
+* Portfolio tracking
+* Watchlists
+* Login system
+* Mobile-friendly interface
+
+---
+
+## Phase 3 — AI Enhancements
+
 * News sentiment analysis
-* Portfolio management
-* Buy/sell confidence score
-* Multi-stock comparison
-* Automatic company-to-symbol mapping
-* Deployment to cloud platforms
+* RAG financial knowledge base
+* Personalized recommendations
+* AI memory
+* Risk profiling
 
 ---
 
-# Recommended Deployment Platforms
+## Phase 4 — Production Deployment
 
-For permanent hosting:
-
-* Render
-* Railway
-* AWS
-* Azure
-* Google Cloud
-
----
-
-# GitHub Setup
-
-Initialize repository:
-
-```bash
-git init
-```
-
-Add files:
-
-```bash
-git add .
-```
-
-Commit:
-
-```bash
-git commit -m "Initial commit"
-```
-
-Connect remote:
-
-```bash
-git remote add origin YOUR_REPO_URL
-```
-
-Push:
-
-```bash
-git branch -M main
-git push -u origin main
-```
+* Deploy backend to Render
+* Permanent public API
+* Remove ngrok dependency
+* Database integration
+* Authentication
+* Monitoring
+* Rate limiting
+* Caching
 
 ---
 
-# Important Security Notes
+# Next Recommended Tasks
 
-Never upload:
+## Immediate Next Step
 
-* API keys
-* ngrok tokens
-* .env files
-* secrets
+### Natural Language Stock Mapping
 
-Use:
+Allow users to type:
 
 ```text
-.gitignore
+Analyze TCS
 ```
 
-for sensitive files.
-
----
-
-# Final Learning Outcome
-
-This project demonstrates the core architecture behind modern AI systems:
+instead of:
 
 ```text
-LLM + Tools + APIs + Backend + Live Data
+TCS.NS
 ```
 
-This is the same foundational pattern used in:
-
-* AI copilots
-* autonomous agents
-* ChatGPT plugins
-* enterprise AI assistants
-* production AI systems
+This improves usability significantly.
 
 ---
 
-# Disclaimer
+## After That
 
-This project is for educational purposes only.
+### Add News Sentiment Analysis
 
-It is NOT financial advice.
+Combine:
 
-Stock market trading involves risk.
-Always perform your own research before investing.
+* technical analysis
+* market news
+* AI reasoning
+
+This creates much more intelligent recommendations.
+
+---
+
+## Later
+
+### Deploy To Render
+
+This removes:
+
+* ngrok restarts
+* manual schema updates
+* local dependency
+
+and makes the AI publicly accessible.
+
+---
+
+# What This Project Teaches
+
+This project teaches:
+
+* API development
+* AI orchestration
+* Tool calling
+* LLM integration
+* Financial data processing
+* Technical analysis
+* Backend engineering
+* Debugging
+* OpenAPI integration
+* Public API exposure
+* Real-world AI architecture
+
+---
+
+# Final Note
+
+This is not just a beginner chatbot project.
+
+This project combines:
+
+* AI
+* APIs
+* backend systems
+* live data
+* technical analysis
+* orchestration
+
+which is much closer to real-world AI engineering systems.
