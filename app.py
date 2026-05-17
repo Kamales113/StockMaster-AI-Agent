@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import yfinance as yf
 from ta.momentum import RSIIndicator
 from ta.trend import MACD
+import talib
 
 app = FastAPI()
 
@@ -20,6 +21,81 @@ def analyze_stock(symbol: str):
         return {"error": "Invalid stock symbol"}
 
     close_prices = stock['Close'].squeeze()
+    # Candlestick Pattern Detection
+
+    # Candlestick Pattern Detection
+
+    open_price = stock['Open'].values.flatten()
+    high_price = stock['High'].values.flatten()
+    low_price = stock['Low'].values.flatten()
+    close_price = stock['Close'].values.flatten()
+
+    patterns = {}
+
+    # Doji
+    patterns["Doji"] = talib.CDLDOJI(
+        open_price,
+        high_price,
+        low_price,
+        close_price
+    )[-1]
+
+    # Hammer
+    patterns["Hammer"] = talib.CDLHAMMER(
+        open_price,
+        high_price,
+        low_price,
+        close_price
+    )[-1]
+
+    # Engulfing
+    patterns["Engulfing"] = talib.CDLENGULFING(
+        open_price,
+        high_price,
+        low_price,
+        close_price
+    )[-1]
+
+    # Morning Star
+    patterns["Morning Star"] = talib.CDLMORNINGSTAR(
+        open_price,
+        high_price,
+        low_price,
+        close_price
+    )[-1]
+
+    # Shooting Star
+    patterns["Shooting Star"] = talib.CDLSHOOTINGSTAR(
+        open_price,
+        high_price,
+        low_price,
+        close_price
+    )[-1]
+
+    # Harami
+    patterns["Harami"] = talib.CDLHARAMI(
+        open_price,
+        high_price,
+        low_price,
+        close_price
+    )[-1]
+
+
+    detected_patterns = []
+
+    for pattern_name, value in patterns.items():
+
+        if value > 0:
+            detected_patterns.append(f"Bullish {pattern_name}")
+
+        elif value < 0:
+            detected_patterns.append(f"Bearish {pattern_name}")
+
+    if len(detected_patterns) == 0:
+        candlestick_pattern = "No Major Pattern"
+
+    else:
+        candlestick_pattern = ", ".join(detected_patterns)
 
     # RSI
     rsi = RSIIndicator(close_prices).rsi().iloc[-1]
@@ -86,6 +162,7 @@ def analyze_stock(symbol: str):
         "RSI Signal": rsi_signal,
         "Trend": trend,
         "MACD Signal": macd_signal,
+        "Candlestick Pattern": candlestick_pattern,
         "Recommendation": recommendation,
         "Confidence": f"{confidence_score}%"
     }
